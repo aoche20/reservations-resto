@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - {{ restaurant.name }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-6xl mx-auto py-10 px-4">
+    <!-- Header -->
+    
+    <div class="flex items-center gap-4 mb-4">
+  {% if restaurant.logo %}
+    <img src="{{ restaurant.logo.url }}" alt="Logo" class="h-12 w-12 object-cover rounded-full" />
+  {% endif %}
+  <h1 class="text-3xl font-bold">Dashboard - {{ restaurant.name }}</h1>
+     <a href="{% url 'logout' %}" class="text-red-600 hover:underline">Déconnexion</a>
+</div>
+
+{% if restaurant.couverture %}
+  <img src="{{ restaurant.couverture.url }}" alt="Couverture" class="w-full h-60 object-cover rounded mb-4" />
+{% endif %}
+
+
+    <!-- Profil Links -->
+    <div class="flex gap-4 items-center mb-8">
+      <button 
+  onclick="document.getElementById('editLogoModal').classList.remove('hidden')" 
+  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+  Modifier logo & couverture
+</button>
+
+      
+      <a href="#" class="text-green-600 hover:underline">Modifier mon compte</a>
+      <a href="{% url 'supprimer_compte' %}" class="text-red-600 hover:underline" onclick="return confirm('Es-tu sûr de vouloir supprimer ton compte ?')">Supprimer mon compte</a>
+    </div>
+
+    <!-- Réservations -->
+    <div class="bg-white p-6 rounded shadow mb-10">
+      <h2 class="text-xl font-semibold mb-4">Réservations</h2>
+      {% if reservations %}
+      <table class="min-w-full table-auto border-collapse border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2 text-left">Client</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Table</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Heure</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in reservations %}
+          <tr class="hover:bg-gray-100">
+            <td class="border border-gray-300 px-4 py-2">{{ r.customer_name }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ r.table.number }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ r.date }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ r.time }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="text-gray-500">Aucune réservation pour le moment.</p>
+      {% endif %}
+    </div>
+
+    <!-- Tables -->
+    <div class="bg-white p-6 rounded shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Tables de mon restaurant</h2>
+        <button onclick="document.getElementById('addTableModal').classList.remove('hidden')" class="text-green-600 hover:underline">+ Ajouter une table</button>
+      </div>
+      <ul class="divide-y divide-gray-200">
+        {% for table in tables %}
+        <li class="py-4 flex justify-between items-center">
+          <div>
+            <strong class="text-gray-800">Table N°{{ table.number }}</strong> — {{ table.seats }} personnes
+          </div>
+          <div class="space-x-3">
+            <button onclick="document.getElementById('editModal{{ table.id }}').classList.remove('hidden')" class="text-blue-600 hover:underline">Modifier</button>
+            <button onclick="document.getElementById('deleteModal{{ table.id }}').classList.remove('hidden')" class="text-red-600 hover:underline">Supprimer</button>
+          </div>
+        </li>
+
+
+
+        <!-- MODAL SUPPRESSION -->
+        <div id="deleteModal{{ table.id }}" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div class="bg-white p-6 rounded shadow w-full max-w-md text-center">
+            <h2 class="text-xl font-bold text-red-700 mb-4">Supprimer la table</h2>
+            <p class="mb-4">Es-tu sûr de vouloir supprimer la table <strong>{{ table.number }}</strong> ?</p>
+            {% if table.id %}
+            <form method="post" action="{% url 'supprimer_table' table.id %}" class="flex justify-center gap-4">
+              {% csrf_token %}
+              <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Oui, supprimer</button>
+              <button type="button" onclick="document.getElementById('deleteModal{{ table.id }}').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Annuler</button>
+            </form>
+            {% else %}
+            <p class="text-red-600 text-sm">Erreur : ID de la table manquant</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- MODAL MODIFIER -->
+        <div id="editModal{{ table.id }}" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div class="bg-white p-6 rounded shadow w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Modifier la table</h2>
+            <form method="post" action="{% url 'modifier_table' table.id %}" class="space-y-4">
+              {% csrf_token %}
+              <input type="text" name="number" value="{{ table.number }}" required class="w-full border px-3 py-2 rounded" />
+              <input type="number" name="seats" value="{{ table.seats }}" required class="w-full border px-3 py-2 rounded" />
+              <div class="flex justify-between">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enregistrer</button>
+                <button type="button" onclick="document.getElementById('editModal{{ table.id }}').classList.add('hidden')" class="text-gray-500 hover:underline">Annuler</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- MODAL AJOUT -->
+  <div id="addTableModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded shadow w-full max-w-md">
+      <h2 class="text-xl font-bold mb-4">Ajouter une table</h2>
+      <form method="post" action="{% url 'ajouter_table' %}" class="space-y-4">
+        {% csrf_token %}
+        {% for field in add_table_form %}
+        <div>
+          {{ field.label_tag }}
+          {{ field }}
+          {{ field.errors }}
+        </div>
+        {% endfor %}
+        <div class="flex justify-between">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Ajouter</button>
+          <button type="button" onclick="document.getElementById('addTableModal').classList.add('hidden')" class="text-gray-500 hover:underline">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+          <div id="editLogoModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="bg-white p-6 rounded shadow w-full max-w-md">
+    <h2 class="text-xl font-bold mb-4">Modifier le logo et la couverture</h2>
+   <form method="post" enctype="multipart/form-data" action="{% url 'dashboard' %}">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+       
+
+      <div>
+        {{ form.logo.label_tag }}
+        {{ form.logo }}
+        {% if restaurant.logo %}
+          <img src="{{ restaurant.logo.url }}" class="h-12 mt-2 rounded" alt="Logo actuel">
+        {% endif %}
+        {{ form.logo.errors }}
+      </div>
+
+      <div>
+        {{ form.couverture.label_tag }}
+        {{ form.couverture }}
+        {% if restaurant.couverture %}
+          <img src="{{ restaurant.couverture.url }}" class="w-full h-32 mt-2 object-cover rounded" alt="Couverture actuelle">
+        {% endif %}
+        {{ form.couverture.errors }}
+      </div>
+
+      <div class="flex justify-between">
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Enregistrer</button>
+        <button type="button" onclick="document.getElementById('editLogoModal').classList.add('hidden')" class="text-gray-500 hover:underline">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

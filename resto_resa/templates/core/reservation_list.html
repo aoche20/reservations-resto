@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Réservations – {{ restaurant.name }}</h1>
+
+  <form method="get" class="mb-4">
+    <input type="hidden" name="slug" value="{{ restaurant.slug }}">
+    <label for="date" class="mr-2">Filtrer par date :</label>
+    <input type="date" name="date" id="date" value="{{ selected_date }}" class="border px-2 py-1 rounded">
+    <button type="submit" class="ml-2 px-4 py-1 bg-blue-600 text-white rounded">Filtrer</button>
+  </form>
+
+  {% if reservations %}
+    <table class="table-auto w-full bg-white shadow rounded">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="px-4 py-2">Client</th>
+          <th class="px-4 py-2">Table</th>
+          <th class="px-4 py-2">Heure</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reservations %}
+          <tr class="border-t">
+            <td class="px-4 py-2">{{ r.customer_name }}</td>
+            <td class="px-4 py-2">{{ r.table.number }}</td>
+            <td class="px-4 py-2">{{ r.time|time:"H:i" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Aucune réservation pour cette date.</p>
+  {% endif %}
+{% endblock %}
