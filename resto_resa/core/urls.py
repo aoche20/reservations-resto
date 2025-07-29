@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import accueil, reservations, dashboard, signup, supprimer_compte, ajouter_table, modifier_table, supprimer_table
+from .views import reservations, dashboard, signup, supprimer_compte, ajouter_table, modifier_table, supprimer_table
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', accueil, name='accueil'),
+  
     path('reservations/', reservations, name='reservations'),
     path('dashboard/', dashboard, name='dashboard'),
     path('signup/', signup, name='signup'),

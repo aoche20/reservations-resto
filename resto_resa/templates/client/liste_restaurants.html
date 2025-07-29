@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Restaurants disponibles | RestoMarket{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-8">
+  <form method="get" class="flex flex-wrap gap-4 mb-6">
+    <select name="ville" class="border p-2 rounded">
+      <option value="">Toutes les villes</option>
+      {% for v in villes %}
+        <option value="{{ v }}" {% if ville == v %}selected{% endif %}>{{ v|capfirst }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="specialite" class="border p-2 rounded">
+      <option value="">Toutes les spécialités</option>
+      {% for s in specialites %}
+        <option value="{{ s }}" {% if specialite == s %}selected{% endif %}>{{ s|capfirst }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Filtrer</button>
+  </form>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for resto in restaurants %}
+      <a href="{% url 'restaurant_detail' resto.slug %}" class="border rounded overflow-hidden bg-white shadow hover:shadow-md transition">
+        {% if resto.couverture %}
+          <img src="{{ resto.couverture.url }}" class="h-40 w-full object-cover">
+        {% endif %}
+        <div class="p-4">
+          <h3 class="text-lg font-semibold">{{ resto.name }}</h3>
+          <p class="text-sm text-gray-600">{{ resto.specialite|capfirst }} – {{ resto.ville|capfirst }}</p>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+
+  {% if restaurants|length == 0 %}
+    <p class="text-center text-gray-500 mt-6">Aucun restaurant trouvé.</p>
+  {% endif %}
+</section>
+{% endblock %}

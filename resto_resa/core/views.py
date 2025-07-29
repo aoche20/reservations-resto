@@ -12,37 +12,11 @@ from .forms import RestaurantForm
 from django.contrib.auth import login
 
 
-def accueil(request):
-    restaurant = request.restaurant
-    return render(request, 'core/accueil.html', {'restaurant': restaurant})
 
 
 
 
-def accueil(request):
-    restaurant = request.restaurant
-
-    if not restaurant:
-        return render(request, 'core/no_restaurant.html')
-
-    if request.method == 'POST':
-        form = ReservationForm(request.POST)
-        if form.is_valid():
-            reservation = form.save(commit=False)
-            reservation.restaurant = restaurant
-            reservation.save()
-            return redirect(f"/?slug={restaurant.slug}&success=1")
-    else:
-        form = ReservationForm()
-
-    # Filtrer les tables du restaurant actif
-    form.fields['table'].queryset = Table.objects.filter(restaurant=restaurant)
-
-    return render(request, 'core/accueil.html', {
-        'restaurant': restaurant,
-        'form': form,
-        'success': request.GET.get('success'),
-    })
+ 
 
 
 @login_required

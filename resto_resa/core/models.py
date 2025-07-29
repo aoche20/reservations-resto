@@ -1,11 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .choices import VILLE_CHOICES, SPECIALITE_CHOICES
 class Restaurant(models.Model):
+    
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
     domain = models.CharField(max_length=255, unique=True)
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
     couverture = models.ImageField(upload_to='couvertures/', blank=True, null=True)
+    ville = models.CharField(max_length=100, choices=VILLE_CHOICES, default='cotonou')
+    specialite = models.CharField(max_length=100, choices=SPECIALITE_CHOICES, default='africain')
+    est_disponible = models.BooleanField(default=True)
 
 
     def __str__(self):

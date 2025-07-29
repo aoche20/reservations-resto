@@ -16,6 +16,13 @@ class ReservationForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'w-full border px-3 py-2 rounded'}),
             'time': forms.TimeInput(attrs={'type': 'time', 'class': 'w-full border px-3 py-2 rounded'}),
         }
+        
+    def __init__(self, *args, **kwargs):
+        restaurant = kwargs.pop('restaurant', None)
+        super().__init__(*args, **kwargs)
+        if restaurant:
+            self.fields['table'].queryset = Table.objects.filter(restaurant=restaurant)
+
 
 
 

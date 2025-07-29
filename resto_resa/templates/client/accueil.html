@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil | RestoMarket{% endblock %}
+
+{% block content %}
+  <!-- Ton contenu spécifique ici -->
+ 
+
+    <section class="bg-cover bg-center h-96 text-white" style="background-image: url('/static/img/hero.jpg');">
+    <div class="bg-black bg-opacity-60 h-full flex flex-col justify-center items-center text-center px-4">
+      <h1 class="text-4xl font-bold mb-4">Réservez dans les meilleurs restaurants du Bénin</h1>
+      <form method="get" action="{% url 'liste_restaurants' %}" class="bg-white rounded flex overflow-hidden w-full max-w-xl">
+        <input type="text" name="ville" placeholder="Ville ou restaurant" class="flex-grow px-4 py-2 text-gray-800" />
+        <button type="submit" class="bg-green-600 px-6 text-white">Rechercher</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- SPÉCIALITÉS -->
+  <section class="py-12 px-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Spécialités populaires</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      {% for specialite in specialites %}
+      <div class="bg-white p-4 rounded shadow hover:shadow-lg cursor-pointer">
+        <span class="text-lg font-medium">{{ specialite }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- RESTAURANTS EN VEDETTE -->
+  <section class="py-12 px-6 bg-white">
+    <h2 class="text-2xl font-bold mb-6 text-center">Restaurants en vedette</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for resto in restaurants %}
+      <a href="{% url 'restaurant_detail' resto.slug %}" class="bg-gray-100 rounded overflow-hidden shadow hover:shadow-lg">
+        {% if resto.couverture %}
+          <img src="{{ resto.couverture.url }}" class="h-40 w-full object-cover" />
+        {% endif %}
+        <div class="p-4">
+          <h3 class="text-xl font-semibold">{{ resto.name }}</h3>
+          <p class="text-gray-600">{{ resto.ville }} – {{ resto.specialite }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-16 bg-green-600 text-white text-center">
+    <h2 class="text-3xl font-bold mb-4">Vous êtes restaurateur ?</h2>
+    <p class="mb-6">Inscrivez votre restaurant et recevez des réservations en ligne 24h/24</p>
+    <a href="{% url 'signup' %}" class="bg-white text-green-700 px-6 py-3 rounded font-semibold hover:bg-gray-100">Rejoignez-nous</a>
+  </section>
+
+
+{% endblock %}
